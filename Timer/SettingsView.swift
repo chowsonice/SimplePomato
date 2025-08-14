@@ -49,6 +49,43 @@ struct SettingsView: View {
                     Spacer()
                 }
                 Divider()
+                Text("🍅 pomodoro settings:")
+                HStack {
+                    Text("Work:")
+                    TextField("", text: Binding(
+                        get: { String(settingsManager.settingsData.pomodoro_work_duration) },
+                        set: { settingsManager.settingsData.pomodoro_work_duration = (Int($0) ?? 25)}
+                    ))
+                        .frame(width: 40)
+                        .multilineTextAlignment(.center)
+                    Text("min")
+                    
+                    Spacer()
+                    
+                    Text("Break:")
+                    TextField("", text: Binding(
+                        get: { String(settingsManager.settingsData.pomodoro_break_duration) },
+                        set: { settingsManager.settingsData.pomodoro_break_duration = (Int($0) ?? 5)}
+                    ))
+                        .frame(width: 40)
+                        .multilineTextAlignment(.center)
+                    Text("min")
+                }
+                HStack {
+                    Text("Long Break:")
+                    TextField("", text: Binding(
+                        get: { String(settingsManager.settingsData.pomodoro_long_break_duration) },
+                        set: { settingsManager.settingsData.pomodoro_long_break_duration = (Int($0) ?? 15)}
+                    ))
+                        .frame(width: 40)
+                        .multilineTextAlignment(.center)
+                    Text("min")
+                    Spacer()
+                    Text("(after 4 sessions)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Divider()
                 Text("alarm volume:")
                 HStack {
                     Image(systemName: "volume.1.fill")
@@ -82,6 +119,8 @@ struct SettingsView: View {
                             setLaunchAtLogin(enabled: false)
                         }
                     }
+                Toggle("show floating timer", isOn: $settingsManager.settingsData.show_floating_timer)
+                    .padding()
             }
         }
         

@@ -24,8 +24,6 @@ struct CustomButton: View {
 }
 
 struct MainView: View {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
     @Binding var timeRemaining: Int
     @State private var selectedIndex = 2
     @State private var isPaused = true
@@ -33,6 +31,12 @@ struct MainView: View {
     @State private var currentTimerPreset = 0
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var soundPlayer = SoundPlayer()
+    
+    // Pomodoro state
+    @State private var isPomodoroMode = false
+    @State private var pomodoroSession = 1 // 1-4 for work sessions
+    @State private var isBreakTime = false
+    @State private var completedPomodoros = 0
     
     @StateObject var settingsManager: SettingsManager = SettingsManager.instance
 
@@ -46,44 +50,46 @@ struct MainView: View {
                 }
             }
             
+            // Pomodoro status indicator
+            if isPomodoroMode {
+                HStack {
+                    Text(isBreakTime ? "☕ Break" : "🍅 Work")
+                        .fontWeight(.medium)
+                        .foregroundColor(isBreakTime ? .blue : .red)
+                    Spacer()
+                    Text("Session \(pomodoroSession)/4")
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 4)
+            }
+            
             HStack(spacing: 1) {
                 Group {
                     if isPaused {
                         CustomButton(text: String(settingsManager.settingsData.timer_presets[0]) + "m")
                             .onTapGesture {
-                                currentTimerPreset = 0
-                                maxTime = max(settingsManager.settingsData.timer_presets[currentTimerPreset] * 60, 1)
-                                timeRemaining = maxTime
-                                timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-                                isPaused = false
-                                soundPlayer.stopSound()
+                                startRegularTimer(preset: 0)
                             }
                         CustomButton(text: String(settingsManager.settingsData.timer_presets[1]) + "m")
                             .onTapGesture {
-                                currentTimerPreset = 1
-                                maxTime = max(settingsManager.settingsData.timer_presets[currentTimerPreset] * 60, 1)
-                                timeRemaining = maxTime
-                                timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-                                isPaused = false
-                                soundPlayer.stopSound()
+                                startRegularTimer(preset: 1)
                             }
                         CustomButton(text: String(settingsManager.settingsData.timer_presets[2]) + "m")
                             .onTapGesture {
-                                currentTimerPreset = 2
-                                maxTime = max(settingsManager.settingsData.timer_presets[currentTimerPreset] * 60, 1)
-                                timeRemaining = maxTime
-                                timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-                                isPaused = false
-                                soundPlayer.stopSound()
+                                startRegularTimer(preset: 2)
+                            }
+                        CustomButton(text: pomodoroButtonText())
+                            .onTapGesture {
+                                startPomodoroTimer()
                             }
                     } else {
                         CustomButton(text: "cancel").onTapGesture {
-                            timeRemaining = maxTime
-                            isPaused = true
+                            cancelTimer()
                         }
                         CustomButton(text: "restart").onTapGesture {
-                            timeRemaining = maxTime
-                            timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+                            restartTimer()
                         }
                     }
                 }
@@ -91,13 +97,13 @@ struct MainView: View {
                 
                 Menu {
                     Button("Settings") {
-                        appDelegate.openCocoaWindow(id: "settings")
+                        AppDelegate.shared.openCocoaWindow(id: "settings")
                     }
                     
                     Divider()
                     
                     Button("About SimplePomato") {
-                        appDelegate.openCocoaWindow(id: "about")
+                        AppDelegate.shared.openCocoaWindow(id: "about")
                     }
                     
                     Button("Quit") {
@@ -148,6 +154,21 @@ struct MainView: View {
                         if timeRemaining == 0 {
                             soundPlayer.playSound(volume: settingsManager.settingsData.alarm_volume)
                             isPaused = true
+                            
+                            if isPomodoroMode {
+                                handlePomodoroCompletion()
+                            }
+                        }
+                        
+                        // Mettre à jour la fenêtre flottante
+                        DispatchQueue.main.async {
+                            AppDelegate.shared.updateFloatingTimer(
+                                timeRemaining: timeRemaining,
+                                isPaused: isPaused,
+                                isPomodoroMode: isPomodoroMode,
+                                isBreakTime: isBreakTime,
+                                pomodoroSession: pomodoroSession
+                            )
                         }
                     }
             }
@@ -155,6 +176,85 @@ struct MainView: View {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
+    }
+    
+    // MARK: - Timer Functions
+    private func startRegularTimer(preset: Int) {
+        isPomodoroMode = false
+        currentTimerPreset = preset
+        maxTime = max(settingsManager.settingsData.timer_presets[preset] * 60, 1)
+        timeRemaining = maxTime
+        timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+        isPaused = false
+        soundPlayer.stopSound()
+    }
+    
+    private func startPomodoroTimer() {
+        isPomodoroMode = true
+        pomodoroSession = 1
+        isBreakTime = false
+        completedPomodoros = 0
+        
+        maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+        timeRemaining = maxTime
+        timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+        isPaused = false
+        soundPlayer.stopSound()
+    }
+    
+    private func handlePomodoroCompletion() {
+        if isBreakTime {
+            // Break completed, prepare next work session or finish cycle
+            isBreakTime = false
+            pomodoroSession += 1
+            
+            if pomodoroSession > 4 {
+                // Completed full Pomodoro cycle
+                isPomodoroMode = false
+                pomodoroSession = 1
+                completedPomodoros += 1
+                return
+            }
+            
+            // Prepare next work session but don't auto-start
+            maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+            timeRemaining = maxTime
+            // Don't restart timer automatically - wait for user to click start
+        } else {
+            // Work session completed, prepare break but don't auto-start
+            isBreakTime = true
+            
+            // Long break after 4th session, short break otherwise
+            let breakDuration = (pomodoroSession == 4) ? 
+                settingsManager.settingsData.pomodoro_long_break_duration :
+                settingsManager.settingsData.pomodoro_break_duration
+            
+            maxTime = breakDuration * 60
+            timeRemaining = maxTime
+            // Don't restart timer automatically - wait for user to click start
+        }
+    }
+    
+    private func cancelTimer() {
+        if isPomodoroMode {
+            isPomodoroMode = false
+            pomodoroSession = 1
+            isBreakTime = false
+        }
+        timeRemaining = maxTime
+        isPaused = true
+    }
+    
+    private func restartTimer() {
+        timeRemaining = maxTime
+        timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    }
+    
+    private func pomodoroButtonText() -> String {
+        if isPomodoroMode && !isPaused {
+            return isBreakTime ? "☕ Break" : "🍅 Work"
+        }
+        return "🍅"
     }
 }
 
