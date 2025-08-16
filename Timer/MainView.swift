@@ -164,6 +164,7 @@ struct MainView: View {
                         DispatchQueue.main.async {
                             AppDelegate.shared.updateFloatingTimer(
                                 timeRemaining: timeRemaining,
+                                maxTime: maxTime,
                                 isPaused: isPaused,
                                 isPomodoroMode: isPomodoroMode,
                                 isBreakTime: isBreakTime,
