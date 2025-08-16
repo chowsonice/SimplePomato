@@ -164,6 +164,7 @@ struct MainView: View {
                         DispatchQueue.main.async {
                             AppDelegate.shared.updateFloatingTimer(
                                 timeRemaining: timeRemaining,
+                                totalTime: maxTime,
                                 isPaused: isPaused,
                                 isPomodoroMode: isPomodoroMode,
                                 isBreakTime: isBreakTime,
@@ -176,9 +177,37 @@ struct MainView: View {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
+        .onAppear {
+            // Ajouter l'observateur pour les actions de la fenêtre flottante
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name("ToggleTimer"),
+                object: nil,
+                queue: .main
+            ) { _ in
+                self.toggleTimer()
+            }
+        }
+        .onDisappear {
+            // Retirer l'observateur
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("ToggleTimer"), object: nil)
+        }
     }
     
     // MARK: - Timer Functions
+    private func toggleTimer() {
+        if isPaused {
+            // Démarrer le timer
+            if timeRemaining > 0 {
+                isPaused = false
+                timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+                soundPlayer.stopSound()
+            }
+        } else {
+            // Mettre en pause le timer
+            isPaused = true
+        }
+    }
+    
     private func startRegularTimer(preset: Int) {
         isPomodoroMode = false
         currentTimerPreset = preset

@@ -88,41 +88,173 @@ struct UtilityApp: App {
     }
 }
 
+// Helper function for time formatting
+func formatTimeComponents(seconds: Int) -> (minutes: String, seconds: String) {
+    let mins = seconds / 60
+    let secs = seconds % 60
+    return (String(format: "%02d", mins), String(format: "%02d", secs))
+}
+
 // Floating Timer View Structure
 struct FloatingTimerView: View {
     var timeRemaining: Int
+    var totalTime: Int
     var isPaused: Bool
     var isPomodoroMode: Bool
     var isBreakTime: Bool
     var pomodoroSession: Int
     
-    var body: some View {
-        VStack(spacing: 8) {
-            if isPomodoroMode {
-                HStack {
-                    Text(isBreakTime ? "☕" : "🍅")
-                        .font(.title2)
-                    Text("Session \(pomodoroSession)/4")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            Text(formatDuration(seconds: timeRemaining))
-                .font(.system(size: 24, weight: .medium, design: .monospaced))
-                .foregroundColor(.primary)
-            Circle()
-                .foregroundColor(isPaused ? Color.gray : (isPomodoroMode && isBreakTime ? Color.blue : Color.red))
-                .frame(width: 8, height: 8)
+    // Couleurs selon le design spécifié - ajustées pour correspondre à l'image
+    private var progressColor: Color {
+        if isPomodoroMode {
+            return isBreakTime ? Color(red: 0.7, green: 0.9, blue: 0.3) : Color(red: 0.8, green: 0.4, blue: 0.8) // Vert pour pause, Violet pour travail
+        } else {
+            return Color(red: 0.23, green: 0.51, blue: 0.98) // Bleu par défaut
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .foregroundColor(Color(NSColor.windowBackgroundColor))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-        )
+    }
+    
+    private var modeLabel: String {
+        if isPomodoroMode {
+            return isBreakTime ? "BREAK" : "FOCUS"
+        } else {
+            return "TIMER"
+        }
+    }
+    
+    private var progress: Double {
+        guard totalTime > 0 else { return 0 }
+        return max(0, min(1, Double(totalTime - timeRemaining) / Double(totalTime)))
+    }
+    
+    // Calculer les segments pour le mode Pomodoro
+    private func pomodoroSegments() -> (workProgress: Double, breakProgress: Double) {
+        if !isPomodoroMode { return (0, 0) }
+        
+        // Dans l'image, il semble y avoir environ 75% pour le travail et 25% pour la pause
+        let workPortion: Double = 0.75
+        let breakPortion: Double = 0.25
+        
+        if isBreakTime {
+            // En pause : montrer le travail complété et la progression de la pause
+            return (workPortion, progress * breakPortion)
+        } else {
+            // En travail : montrer seulement la progression du travail
+            return (progress * workPortion, 0)
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            // Fond sombre avec coins arrondis comme dans l'image
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(red: 0.15, green: 0.1, blue: 0.2))
+                .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 4)
+            
+            VStack(spacing: 12) {
+                // Label du mode (FOCUS/BREAK/TIMER)
+                Text(modeLabel)
+                    .font(.system(size: 12, weight: .semibold, design: .default))
+                    .foregroundColor(.white)
+                    .tracking(0.8)
+                
+                // Indicateur de progression circulaire
+                ZStack {
+                    // Cercle de fond (track) - plus épais comme dans l'image
+                    Circle()
+                        .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), lineWidth: 12)
+                        .frame(width: 90, height: 90)
+                    
+                    if isPomodoroMode {
+                        // Mode Pomodoro : afficher les segments de travail et de pause
+                        let workColor = Color(red: 0.8, green: 0.4, blue: 0.8) // Violet pour travail
+                        let breakColor = Color(red: 0.7, green: 0.9, blue: 0.3) // Vert pour pause
+                        let segments = pomodoroSegments()
+                        
+                        // Segment de travail (violet) - commence au début
+                        if segments.workProgress > 0 {
+                            Circle()
+                                .trim(from: 0, to: segments.workProgress)
+                                .stroke(workColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                                .frame(width: 90, height: 90)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.easeInOut(duration: 0.5), value: segments.workProgress)
+                        }
+                        
+                        // Segment de pause (vert) - commence après le travail
+                        if segments.breakProgress > 0 {
+                            Circle()
+                                .trim(from: 0.75, to: 0.75 + segments.breakProgress)
+                                .stroke(breakColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                                .frame(width: 90, height: 90)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.easeInOut(duration: 0.5), value: segments.breakProgress)
+                        }
+                    } else {
+                        // Mode timer normal
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(progressColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .frame(width: 90, height: 90)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.easeInOut(duration: 0.5), value: progress)
+                    }
+                    
+                    // Indicateur de fin de progression (petit point blanc)
+                    if progress > 0 {
+                        let dotProgress = isPomodoroMode ? (isBreakTime ? 0.75 + (progress * 0.25) : progress * 0.75) : progress
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 8, height: 8)
+                            .offset(y: -45)
+                            .rotationEffect(.degrees((dotProgress * 360)))
+                            .animation(.easeInOut(duration: 0.5), value: dotProgress)
+                    }
+                    
+                    // Temps restant au centre avec formatage amélioré
+                    VStack(spacing: 2) {
+                        let timeComponents = formatTimeComponents(seconds: timeRemaining)
+                        HStack(alignment: .lastTextBaseline, spacing: 2) {
+                            Text(timeComponents.minutes)
+                                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                                .foregroundColor(.white)
+                            Text("m")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.7))
+                        }
+                        HStack(alignment: .lastTextBaseline, spacing: 2) {
+                            Text(timeComponents.seconds)
+                                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                                .foregroundColor(.white)
+                            Text("s")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.7))
+                        }
+                    }
+                }
+                
+                // Bouton d'action - style de l'image
+                Button(action: {
+                    // Action sera gérée par l'AppDelegate
+                    NotificationCenter.default.post(name: NSNotification.Name("ToggleTimer"), object: nil)
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(progressColor)
+                            .frame(width: 36, height: 36)
+                            .shadow(color: progressColor.opacity(0.3), radius: 4, x: 0, y: 2)
+                        
+                        Image(systemName: isPaused ? "play.fill" : "pause.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .scaleEffect(1.0)
+                .animation(.easeInOut(duration: 0.2), value: isPaused)
+            }
+            .padding(16)
+        }
+        .frame(width: 140, height: 180)
     }
 }
 
@@ -216,30 +348,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func createFloatingTimerWindow() {
         self.floatingTimerWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 160, height: 100),
+            contentRect: NSRect(x: 0, y: 0, width: 140, height: 180),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
         
-        floatingTimerWindow.isOpaque = true
-        floatingTimerWindow.backgroundColor = NSColor.windowBackgroundColor
+        floatingTimerWindow.isOpaque = false
+        floatingTimerWindow.backgroundColor = NSColor.clear
         floatingTimerWindow.level = .floating
         floatingTimerWindow.isMovableByWindowBackground = true
-        floatingTimerWindow.hasShadow = true
+        floatingTimerWindow.hasShadow = false
         floatingTimerWindow.isReleasedWhenClosed = false
         
         if let screen = NSScreen.main {
             let screenFrame = screen.visibleFrame
             floatingTimerWindow.setFrameOrigin(NSPoint(
-                x: screenFrame.maxX - 180,
-                y: screenFrame.maxY - 120
+                x: screenFrame.maxX - 160,
+                y: screenFrame.maxY - 200
             ))
         }
         
         // Create persistent hosting view once
         let initialView = FloatingTimerView(
             timeRemaining: 0,
+            totalTime: 1,
             isPaused: false,
             isPomodoroMode: false,
             isBreakTime: false,
@@ -267,7 +400,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         hostingView = nil
     }
     
-    func updateFloatingTimer(timeRemaining: Int, isPaused: Bool, isPomodoroMode: Bool, isBreakTime: Bool, pomodoroSession: Int) {
+    func updateFloatingTimer(timeRemaining: Int, totalTime: Int, isPaused: Bool, isPomodoroMode: Bool, isBreakTime: Bool, pomodoroSession: Int) {
         guard settingsManager.settingsData.show_floating_timer else {
             hideFloatingTimer()
             return
@@ -283,6 +416,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Update rootView instead of creating a new hosting view each time
         hostingView.rootView = FloatingTimerView(
             timeRemaining: timeRemaining,
+            totalTime: totalTime,
             isPaused: isPaused,
             isPomodoroMode: isPomodoroMode,
             isBreakTime: isBreakTime,
