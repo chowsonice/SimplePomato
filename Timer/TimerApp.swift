@@ -160,15 +160,18 @@ struct FloatingTimerView: View {
                 // Indicateur de progression circulaire
                 ZStack {
                     // Cercle de fond (track) - plus épais comme dans l'image
-                    Circle()
-                        .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), lineWidth: 12)
-                        .frame(width: 90, height: 90)
-                    
+
                     if isPomodoroMode {
                         // Mode Pomodoro : afficher les segments de travail et de pause
                         let workColor = Color(red: 0.8, green: 0.4, blue: 0.8) // Violet pour travail
                         let breakColor = Color(red: 0.7, green: 0.9, blue: 0.3) // Vert pour pause
                         let segments = pomodoroSegments()
+
+                        Circle()
+                            .trim(from: 0, to: 0.8)
+                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .frame(width: 90, height: 90)
+                            .rotationEffect(.degrees(-90))
                         
                         // Segment de travail (violet) - commence au début
                         if segments.workProgress > 0 {
@@ -190,6 +193,10 @@ struct FloatingTimerView: View {
                                 .animation(.easeInOut(duration: 0.5), value: segments.breakProgress)
                         }
                     } else {
+                        Circle()
+                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .frame(width: 90, height: 90)
+
                         // Mode timer normal
                         Circle()
                             .trim(from: 0, to: progress)
