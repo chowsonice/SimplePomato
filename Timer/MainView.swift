@@ -183,6 +183,8 @@ struct MainView: View {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
+        .background(Color.white.opacity(0.25))
+        .cornerRadius(10)
         .onAppear {
             // Ajouter l'observateur pour les actions de la fenêtre flottante
             NotificationCenter.default.addObserver(
