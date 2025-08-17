@@ -23,6 +23,56 @@ struct CustomButton: View {
     }
 }
 
+struct CustomIconButton: View {
+    let text: String
+    let iconName: String
+    @State var isActive: Bool = false
+    
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(systemName: iconName)
+                .font(.system(size: 11))
+            Text(text)
+        }
+        .onHover { isHovered in
+            self.isActive = isHovered
+        }
+        .padding(.vertical, 3)
+        .padding(.horizontal, 6)
+        .background(isActive ? Color.white.opacity(0.15) : Color.clear)
+        .cornerRadius(4)
+    }
+}
+
+struct CustomImageButton: View {
+    let text: String
+    let imageName: String?
+    let systemIconName: String?
+    @State var isActive: Bool = false
+    
+    var body: some View {
+        HStack(spacing: 3) {
+            if let imageName = imageName {
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 12, height: 12)
+            } else if let systemIconName = systemIconName {
+                Image(systemName: systemIconName)
+                    .font(.system(size: 11))
+            }
+            Text(text)
+        }
+        .onHover { isHovered in
+            self.isActive = isHovered
+        }
+        .padding(.vertical, 3)
+        .padding(.horizontal, 6)
+        .background(isActive ? Color.white.opacity(0.15) : Color.clear)
+        .cornerRadius(4)
+    }
+}
+
 struct MainView: View {
     @Binding var timeRemaining: Int
     @State private var selectedIndex = 2
@@ -56,9 +106,20 @@ struct MainView: View {
             // Pomodoro status indicator
             if isPomodoroMode {
                 HStack {
-                    Text(isBreakTime ? "☕ Break" : "🍅 Work")
-                        .fontWeight(.medium)
-                        .foregroundColor(isBreakTime ? .blue : .red)
+                    HStack(spacing: 4) {
+                        if isBreakTime {
+                            Image(systemName: "cup.and.saucer.fill")
+                                .foregroundColor(.blue)
+                        } else {
+                            Image("tomato-icon")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 14, height: 14)
+                        }
+                        Text(isBreakTime ? "Break" : "Work")
+                            .fontWeight(.medium)
+                            .foregroundColor(isBreakTime ? .blue : .red)
+                    }
                     Spacer()
                     Text("Session \(pomodoroSession)/4")
                         .fontWeight(.medium)
@@ -83,7 +144,11 @@ struct MainView: View {
                             .onTapGesture {
                                 startRegularTimer(preset: 2)
                             }
-                        CustomButton(text: pomodoroButtonText())
+                        CustomImageButton(
+                            text: pomodoroButtonText(),
+                            imageName: pomodoroImageName(),
+                            systemIconName: pomodoroSystemIconName()
+                        )
                             .onTapGesture {
                                 startPomodoroTimer()
                             }
@@ -293,9 +358,30 @@ struct MainView: View {
     
     private func pomodoroButtonText() -> String {
         if isPomodoroMode && !isPaused {
-            return isBreakTime ? "☕ Break" : "🍅 Work"
+            return isBreakTime ? "Break" : "Work"
         }
-        return "🍅"
+        return "Pomodoro"
+    }
+    
+    private func pomodoroIconName() -> String {
+        if isPomodoroMode && !isPaused {
+            return isBreakTime ? "cup.and.saucer.fill" : "timer"
+        }
+        return "timer"
+    }
+    
+    private func pomodoroImageName() -> String? {
+        if isPomodoroMode && !isPaused {
+            return isBreakTime ? nil : "tomato-icon"
+        }
+        return "tomato-icon"
+    }
+    
+    private func pomodoroSystemIconName() -> String? {
+        if isPomodoroMode && !isPaused {
+            return isBreakTime ? "cup.and.saucer.fill" : nil
+        }
+        return nil
     }
 }
 
