@@ -128,6 +128,11 @@ struct FloatingTimerView: View {
         guard totalTime > 0 else { return 0 }
         return max(0, min(1, Double(totalTime - timeRemaining) / Double(totalTime)))
     }
+
+    private var pomodoroProgress: Double {
+        guard totalTime > 0 else { return 0 }
+        return max(0, min(1, Double(timeRemaining) / Double(totalTime)))
+    }
     
     // Calculer les segments pour le mode Pomodoro
     private func pomodoroSegments() -> (workProgress: Double, breakProgress: Double) {
@@ -139,10 +144,10 @@ struct FloatingTimerView: View {
 
         if isBreakTime {
             // En pause : montrer le travail complété et la progression de la pause
-            return (workPortion, progress * breakPortion)
+            return (workPortion - 0.04, progress * (breakPortion - 0.08))
         } else {
             // En travail : montrer seulement la progression du travail
-            return (progress * workPortion, 0)
+            return (progress * (workPortion - 0.08), 0)
         }
     }
     
@@ -170,8 +175,18 @@ struct FloatingTimerView: View {
                         let breakColor = Color(red: 0.7, green: 0.9, blue: 0.3) // Vert pour pause
                         let segments = pomodoroSegments()
 
+                        let total = Double(workDuration + breakDuration)
+                        let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
+                        let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+
                         Circle()
-                            .trim(from: 0, to: 0.8)
+                            .trim(from: 0.04, to: workPortion - 0.04)
+                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .frame(width: 90, height: 90)
+                            .rotationEffect(.degrees(-90))
+
+                        Circle()
+                            .trim(from: workPortion + 0.04, to: 1 - 0.04)
                             .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
                             .frame(width: 90, height: 90)
                             .rotationEffect(.degrees(-90))
@@ -179,7 +194,7 @@ struct FloatingTimerView: View {
                         // Segment de travail (violet) - commence au début
                         if segments.workProgress > 0 {
                             Circle()
-                                .trim(from: 0, to: segments.workProgress)
+                                .trim(from: 0.04, to: segments.workProgress)
                                 .stroke(workColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
                                 .frame(width: 90, height: 90)
                                 .rotationEffect(.degrees(-90))
@@ -189,7 +204,7 @@ struct FloatingTimerView: View {
                         // Segment de pause (vert) - commence après le travail
                         if segments.breakProgress > 0 {
                             Circle()
-                                .trim(from: 0.75, to: 0.75 + segments.breakProgress)
+                                .trim(from: workPortion + 0.04, to: workPortion + 0.04 + segments.breakProgress)
                                 .stroke(breakColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
                                 .frame(width: 90, height: 90)
                                 .rotationEffect(.degrees(-90))
@@ -211,12 +226,18 @@ struct FloatingTimerView: View {
                     
                     // Indicateur de fin de progression (petit point blanc)
                     if progress > 0 {
-                        let dotProgress = isPomodoroMode ? (isBreakTime ? 0.75 + (progress * 0.25) : progress * 0.75) : progress
+                        let total = Double(workDuration + breakDuration)
+                        let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
+                        let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+                        
+                        let dotProgress: Double = isPomodoroMode ? 
+                            (isBreakTime ? workPortion + 0.04 + (progress * (breakPortion - 0.08)) : 0.04 + progress * (workPortion - 0.08)) :
+                            progress
                         Circle()
                             .fill(Color.white)
                             .frame(width: 8, height: 8)
                             .offset(y: -45)
-                            .rotationEffect(.degrees((dotProgress * 360)))
+                            .rotationEffect(.degrees(dotProgress * 360))
                             .animation(.easeInOut(duration: 0.5), value: dotProgress)
                     }
                     

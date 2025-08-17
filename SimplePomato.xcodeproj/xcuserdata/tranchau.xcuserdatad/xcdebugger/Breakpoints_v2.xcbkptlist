@@ -34,36 +34,6 @@
             endingLineNumber = "213"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "62B57394-3427-4065-B94F-CDE39831806F - ba943767cfa18e34"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "SimplePomato.AppDelegate.createFloatingTimerWindow() -&gt; ()"
-                  moduleName = "SimplePomato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tranchau/Project/SimplePomato/Timer/TimerApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "213"
-                  endingLineNumber = "213">
-               </Location>
-               <Location
-                  uuid = "62B57394-3427-4065-B94F-CDE39831806F - 69c759138f25091f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "SimplePomato.AppDelegate.createSettingsWindow() -&gt; ()"
-                  moduleName = "SimplePomato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tranchau/Project/SimplePomato/Timer/TimerApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "213"
-                  endingLineNumber = "213">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
