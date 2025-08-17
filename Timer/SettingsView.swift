@@ -25,7 +25,7 @@ struct SettingsView: View {
     var body: some View {
         Form {
             VStack {
-                Text("timer presets (min):")
+                Text("Timer presets (min):")
                 HStack(alignment: .center) {
                     Spacer()
                     TextField("", text: Binding(
@@ -49,7 +49,7 @@ struct SettingsView: View {
                     Spacer()
                 }
                 Divider()
-                Text("🍅 pomodoro settings:")
+                Text("🍅 Pomodoro Settings:")
                 HStack {
                     Text("Work:")
                     TextField("", text: Binding(

@@ -31,13 +31,16 @@ struct MainView: View {
     @State private var currentTimerPreset = 0
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var soundPlayer = SoundPlayer()
-    
+
     // Pomodoro state
     @State private var isPomodoroMode = false
     @State private var pomodoroSession = 1 // 1-4 for work sessions
     @State private var isBreakTime = false
     @State private var completedPomodoros = 0
-    
+    @State private var regularDuration: Int = 25 // Default regular duration in minutes
+    @State private var workDuration: Int = 25 // Default work duration in minutes
+    @State private var breakDuration: Int = 5 // Default break duration in minutes
+    @State private var longBreakDuration: Int = 15 // Default long break duration in minutes
     @StateObject var settingsManager: SettingsManager = SettingsManager.instance
 
     var body: some View {
@@ -168,7 +171,10 @@ struct MainView: View {
                                 isPaused: isPaused,
                                 isPomodoroMode: isPomodoroMode,
                                 isBreakTime: isBreakTime,
-                                pomodoroSession: pomodoroSession
+                                pomodoroSession: pomodoroSession,
+                                workDuration: workDuration,
+                                breakDuration: breakDuration,
+                                longBreakDuration: longBreakDuration
                             )
                         }
                     }
@@ -211,7 +217,8 @@ struct MainView: View {
     private func startRegularTimer(preset: Int) {
         isPomodoroMode = false
         currentTimerPreset = preset
-        maxTime = max(settingsManager.settingsData.timer_presets[preset] * 60, 1)
+        regularDuration = settingsManager.settingsData.timer_presets[preset]
+        maxTime = max(regularDuration * 60, 1)
         timeRemaining = maxTime
         timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
         isPaused = false
@@ -223,8 +230,11 @@ struct MainView: View {
         pomodoroSession = 1
         isBreakTime = false
         completedPomodoros = 0
-        
-        maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+
+        workDuration = settingsManager.settingsData.pomodoro_work_duration
+        breakDuration = settingsManager.settingsData.pomodoro_break_duration
+        longBreakDuration = settingsManager.settingsData.pomodoro_long_break_duration
+        maxTime = workDuration * 60
         timeRemaining = maxTime
         timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
         isPaused = false

@@ -103,7 +103,10 @@ struct FloatingTimerView: View {
     var isPomodoroMode: Bool
     var isBreakTime: Bool
     var pomodoroSession: Int
-    
+    var workDuration: Int
+    var breakDuration: Int
+    var longBreakDuration: Int
+
     // Couleurs selon le design spécifié - ajustées pour correspondre à l'image
     private var progressColor: Color {
         if isPomodoroMode {
@@ -130,10 +133,10 @@ struct FloatingTimerView: View {
     private func pomodoroSegments() -> (workProgress: Double, breakProgress: Double) {
         if !isPomodoroMode { return (0, 0) }
         
-        // Dans l'image, il semble y avoir environ 75% pour le travail et 25% pour la pause
-        let workPortion: Double = 0.75
-        let breakPortion: Double = 0.25
-        
+        let total = Double(workDuration + breakDuration)
+        let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
+        let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+
         if isBreakTime {
             // En pause : montrer le travail complété et la progression de la pause
             return (workPortion, progress * breakPortion)
@@ -383,7 +386,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             isPaused: false,
             isPomodoroMode: false,
             isBreakTime: false,
-            pomodoroSession: 0
+            pomodoroSession: 0,
+            workDuration: 25,
+            breakDuration: 5,
+            longBreakDuration: 15
         )
         hostingView = NSHostingView(rootView: initialView)
         floatingTimerWindow.contentView = hostingView
@@ -407,7 +413,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         hostingView = nil
     }
     
-    func updateFloatingTimer(timeRemaining: Int, totalTime: Int, isPaused: Bool, isPomodoroMode: Bool, isBreakTime: Bool, pomodoroSession: Int) {
+    func updateFloatingTimer(timeRemaining: Int, totalTime: Int, isPaused: Bool, isPomodoroMode: Bool, isBreakTime: Bool, pomodoroSession: Int, workDuration: Int, breakDuration: Int, longBreakDuration: Int) {
         guard settingsManager.settingsData.show_floating_timer else {
             hideFloatingTimer()
             return
@@ -427,7 +433,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             isPaused: isPaused,
             isPomodoroMode: isPomodoroMode,
             isBreakTime: isBreakTime,
-            pomodoroSession: pomodoroSession
+            pomodoroSession: pomodoroSession,
+            workDuration: workDuration,
+            breakDuration: breakDuration,
+            longBreakDuration: longBreakDuration
         )
         
         if !floatingTimerWindow.isVisible {
