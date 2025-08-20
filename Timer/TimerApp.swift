@@ -147,7 +147,7 @@ struct FloatingTimerView: View {
             return (workPortion - 0.04, progress * (breakPortion - 0.08))
         } else {
             // En travail : montrer seulement la progression du travail
-            return (progress * (workPortion - 0.08), 0)
+            return (0.04 + progress * (workPortion - 0.08), 0)
         }
     }
     

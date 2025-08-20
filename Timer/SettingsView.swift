@@ -51,7 +51,7 @@ struct SettingsView: View {
                 Divider()
                 Text("🍅 Pomodoro Settings:")
                 HStack {
-                    Text("Work:")
+                    Text("work:")
                     TextField("", text: Binding(
                         get: { String(settingsManager.settingsData.pomodoro_work_duration) },
                         set: { settingsManager.settingsData.pomodoro_work_duration = (Int($0) ?? 25)}

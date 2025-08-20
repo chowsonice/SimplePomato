@@ -10,14 +10,13 @@
 		307181692A2D740E00E10B2C /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071815C2A2D740E00E10B2C /* AboutView.swift */; };
 		3071816A2A2D740E00E10B2C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071815D2A2D740E00E10B2C /* SettingsView.swift */; };
 		3071816C2A2D740E00E10B2C /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071815F2A2D740E00E10B2C /* SoundPlayer.swift */; };
-		3071816D2A2D740E00E10B2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 307181612A2D740E00E10B2C /* Assets.xcassets */; };
-		3071816E2A2D740E00E10B2C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 307181632A2D740E00E10B2C /* Preview Assets.xcassets */; };
 		3071816F2A2D740E00E10B2C /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307181642A2D740E00E10B2C /* UserDefaults.swift */; };
 		307181702A2D740E00E10B2C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307181652A2D740E00E10B2C /* MainView.swift */; };
 		307181712A2D740E00E10B2C /* TimeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307181662A2D740E00E10B2C /* TimeHelper.swift */; };
 		307181722A2D740E00E10B2C /* TimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307181672A2D740E00E10B2C /* TimerApp.swift */; };
 		307181802A2E98DE00E10B2C /* beep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3071817F2A2E98DE00E10B2C /* beep.mp3 */; };
 		30AB56DB2A3D56DB0038E81A /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 30AB56DA2A3D56DB0038E81A /* test.png */; };
+		399968A02E55D54A00911A43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3999689F2E55D54A00911A43 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,8 +24,6 @@
 		3071815D2A2D740E00E10B2C /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3071815F2A2D740E00E10B2C /* SoundPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
 		307181602A2D740E00E10B2C /* Timer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Timer.entitlements; sourceTree = "<group>"; };
-		307181612A2D740E00E10B2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		307181632A2D740E00E10B2C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		307181642A2D740E00E10B2C /* UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		307181652A2D740E00E10B2C /* MainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		307181662A2D740E00E10B2C /* TimeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeHelper.swift; sourceTree = "<group>"; };
@@ -35,6 +32,7 @@
 		3071817F2A2E98DE00E10B2C /* beep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = beep.mp3; sourceTree = "<group>"; };
 		3096B6582A2C274D00E3EC2A /* SimplePomato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimplePomato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30AB56DA2A3D56DB0038E81A /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
+		3999689F2E55D54A00911A43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,8 +53,6 @@
 				3071815D2A2D740E00E10B2C /* SettingsView.swift */,
 				3071815F2A2D740E00E10B2C /* SoundPlayer.swift */,
 				307181602A2D740E00E10B2C /* Timer.entitlements */,
-				307181612A2D740E00E10B2C /* Assets.xcassets */,
-				307181622A2D740E00E10B2C /* Preview Content */,
 				307181642A2D740E00E10B2C /* UserDefaults.swift */,
 				307181652A2D740E00E10B2C /* MainView.swift */,
 				307181662A2D740E00E10B2C /* TimeHelper.swift */,
@@ -64,16 +60,9 @@
 				307181682A2D740E00E10B2C /* Info.plist */,
 				3071817F2A2E98DE00E10B2C /* beep.mp3 */,
 				30AB56DA2A3D56DB0038E81A /* test.png */,
+				3999689F2E55D54A00911A43 /* Assets.xcassets */,
 			);
 			path = Timer;
-			sourceTree = "<group>";
-		};
-		307181622A2D740E00E10B2C /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				307181632A2D740E00E10B2C /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		3096B64F2A2C274D00E3EC2A = {
@@ -120,7 +109,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					3096B6572A2C274D00E3EC2A = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -151,9 +140,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				30AB56DB2A3D56DB0038E81A /* test.png in Resources */,
+				399968A02E55D54A00911A43 /* Assets.xcassets in Resources */,
 				307181802A2E98DE00E10B2C /* beep.mp3 in Resources */,
-				3071816D2A2D740E00E10B2C /* Assets.xcassets in Resources */,
-				3071816E2A2D740E00E10B2C /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,9 +198,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -270,9 +260,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -299,6 +291,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 4;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -329,6 +322,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 4;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
