@@ -6,21 +6,35 @@ struct UtilityApp: App {
     @State private var timeRemaining: Int = 300
     @State private var appearanceObserver: NSObjectProtocol?
 
-    var body: some Scene {
-        MenuBarExtra {
-            MainView(timeRemaining: $timeRemaining)
-        } label: {
-            Image(nsImage: createMenuBarImage(text: formatDuration(seconds: timeRemaining)))
-                .onAppear {
-                    setupAppearanceObserver()
-                }
-                .onDisappear {
-                    removeAppearanceObserver()
-                }
-        }
-        .menuBarExtraStyle(.window)
-        .windowStyle(HiddenTitleBarWindowStyle())
+var body: some Scene {
+    MenuBarExtra {
+        MainView(timeRemaining: $timeRemaining)
+    } label: {
+        Image(nsImage: createMenuBarImage(text: formatDuration(seconds: timeRemaining)))
+            .onAppear {
+                setupAppearanceObserver()
+            }
+            .onDisappear {
+                removeAppearanceObserver()
+            }
     }
+    .menuBarExtraStyle(.window)
+    .windowStyle(HiddenTitleBarWindowStyle())
+
+    WindowGroup("Floating Timer") {
+        FloatingTimerView(
+            timeRemaining: timeRemaining,
+            totalTime: 300,
+            isPaused: true,
+            isPomodoroMode: false,
+            isBreakTime: false,
+            pomodoroSession: 1,
+            workDuration: 25,
+            breakDuration: 5,
+            longBreakDuration: 15
+        )
+    }
+}
     
     private func setupAppearanceObserver() {
         appearanceObserver = NotificationCenter.default.addObserver(
@@ -97,6 +111,7 @@ func formatTimeComponents(seconds: Int) -> (minutes: String, seconds: String) {
 
 // Floating Timer View Structure
 struct FloatingTimerView: View {
+    private static let backgroundColor = Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.7)
     var timeRemaining: Int
     var totalTime: Int
     var isPaused: Bool
@@ -153,18 +168,18 @@ struct FloatingTimerView: View {
     
     var body: some View {
         ZStack {
-            // Fond sombre avec coins arrondis comme dans l'image
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(red: 0.15, green: 0.1, blue: 0.2))
-                .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 4)
-            
-            VStack(spacing: 12) {
-                // Label du mode (FOCUS/BREAK/TIMER)
-                Text(modeLabel)
-                    .font(.system(size: 12, weight: .semibold, design: .default))
-                    .foregroundColor(.white)
-                    .tracking(0.8)
-                
+            // Fond harmonisé avec MainView
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.85))
+                .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 2)
+                VStack(spacing: 12) {
+                    // Label du mode (FOCUS/BREAK/TIMER)
+            Text(modeLabel)
+                .font(.system(size: 13))
+                .fontWeight(.medium)
+                .foregroundColor(.primary)
+                .tracking(0.8)
+                        
                 // Indicateur de progression circulaire
                 ZStack {
                     // Cercle de fond (track) - plus épais comme dans l'image
@@ -181,13 +196,13 @@ struct FloatingTimerView: View {
 
                         Circle()
                             .trim(from: 0.04, to: workPortion - 0.04)
-                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .stroke(Color(red: 0.73, green: 0.73, blue: 0.73), style: StrokeStyle(lineWidth: 10, lineCap: .round))
                             .frame(width: 90, height: 90)
                             .rotationEffect(.degrees(-90))
 
                         Circle()
                             .trim(from: workPortion + 0.04, to: 1 - 0.04)
-                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .stroke(Color(red: 0.73, green: 0.73, blue: 0.73), style: StrokeStyle(lineWidth: 10, lineCap: .round))
                             .frame(width: 90, height: 90)
                             .rotationEffect(.degrees(-90))
                         
@@ -195,7 +210,7 @@ struct FloatingTimerView: View {
                         if segments.workProgress > 0 {
                             Circle()
                                 .trim(from: 0.04, to: segments.workProgress)
-                                .stroke(workColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                                .stroke(workColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                                 .frame(width: 90, height: 90)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.workProgress)
@@ -205,20 +220,20 @@ struct FloatingTimerView: View {
                         if segments.breakProgress > 0 {
                             Circle()
                                 .trim(from: workPortion + 0.04, to: workPortion + 0.04 + segments.breakProgress)
-                                .stroke(breakColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                                .stroke(breakColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                                 .frame(width: 90, height: 90)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.breakProgress)
                         }
                     } else {
                         Circle()
-                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 10, lineCap: .round))
                             .frame(width: 90, height: 90)
 
                         // Mode timer normal
                         Circle()
                             .trim(from: 0, to: progress)
-                            .stroke(progressColor, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                            .stroke(progressColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                             .frame(width: 90, height: 90)
                             .rotationEffect(.degrees(-90))
                             .animation(.easeInOut(duration: 0.5), value: progress)
@@ -242,25 +257,29 @@ struct FloatingTimerView: View {
                     }
                     
                     // Temps restant au centre avec formatage amélioré
-                    VStack(spacing: 2) {
-                        let timeComponents = formatTimeComponents(seconds: timeRemaining)
-                        HStack(alignment: .lastTextBaseline, spacing: 2) {
-                            Text(timeComponents.minutes)
-                                .font(.system(size: 18, weight: .bold, design: .monospaced))
-                                .foregroundColor(.white)
-                            Text("m")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(Color.white.opacity(0.7))
-                        }
-                        HStack(alignment: .lastTextBaseline, spacing: 2) {
-                            Text(timeComponents.seconds)
-                                .font(.system(size: 18, weight: .bold, design: .monospaced))
-                                .foregroundColor(.white)
-                            Text("s")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(Color.white.opacity(0.7))
-                        }
-                    }
+VStack(spacing: 2) {
+    let timeComponents = formatTimeComponents(seconds: timeRemaining)
+    HStack(alignment: .lastTextBaseline, spacing: 2) {
+Text(timeComponents.minutes)
+    .font(.system(size: 28))
+    .fontWeight(.thin)
+    .foregroundColor(.primary)
+Text("m")
+    .font(.system(size: 12))
+    .fontWeight(.medium)
+    .foregroundColor(.primary)
+    }
+    HStack(alignment: .lastTextBaseline, spacing: 2) {
+Text(timeComponents.seconds)
+    .font(.system(size: 28))
+    .fontWeight(.thin)
+    .foregroundColor(.primary)
+Text("s")
+    .font(.system(size: 12))
+    .fontWeight(.medium)
+    .foregroundColor(.primary)
+    }
+}
                 }
                 
                 // Bouton d'action - style de l'image
@@ -283,9 +302,9 @@ struct FloatingTimerView: View {
                 .scaleEffect(1.0)
                 .animation(.easeInOut(duration: 0.2), value: isPaused)
             }
-            .padding(16)
+            .padding(.all, 10.0)
         }
-        .frame(width: 140, height: 180)
+    .frame(width: 250)
     }
 }
 

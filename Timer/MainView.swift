@@ -95,7 +95,7 @@ struct MainView: View {
                                 .frame(width: 16, height: 16)
                                 .foregroundColor(.red)
                         }
-                        Text(isBreakTime ? "Break" : "Work")
+                        Text(isBreakTime ? "break" : "work")
                             .fontWeight(.medium)
                             .foregroundColor(isBreakTime ? .blue : .red)
                     }
@@ -226,7 +226,7 @@ struct MainView: View {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
-        .background(Color.white.opacity(0.25))
+        .background(Color(NSColor.windowBackgroundColor).opacity(0.2))
         .cornerRadius(10)
         .onAppear {
             // Ajouter l'observateur pour les actions de la fenêtre flottante
@@ -336,9 +336,9 @@ struct MainView: View {
     
     private func pomodoroButtonText() -> String {
         if isPomodoroMode && !isPaused {
-            return isBreakTime ? "Break" : "Work"
+            return isBreakTime ? "break" : "work"
         }
-        return "Pomodoro"
+        return "pomo"
     }
     
     private func pomodoroIconName() -> String {
