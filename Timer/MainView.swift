@@ -64,6 +64,7 @@ struct MainView: View {
     @State private var pomodoroSession = 1 // 1-4 for work sessions
     @State private var isBreakTime = false
     @State private var completedPomodoros = 0
+    @State private var isExtra = false
     @State private var regularDuration: Int = 25 // Default regular duration in minutes
     @State private var workDuration: Int = 25 // Default work duration in minutes
     @State private var breakDuration: Int = 5 // Default break duration in minutes
@@ -88,7 +89,7 @@ struct MainView: View {
                             Image(systemName: "cup.and.saucer.fill")
                                 .resizable()
                                 .frame(width: 16, height: 16)
-                                .foregroundColor(.blue)
+                                .foregroundColor(.black)
                         } else {
                             Image("tomato")
                                 .resizable()
@@ -97,7 +98,7 @@ struct MainView: View {
                         }
                         Text(isBreakTime ? "break" : "work")
                             .fontWeight(.medium)
-                            .foregroundColor(isBreakTime ? .blue : .red)
+                            .foregroundColor(isBreakTime ? .black : .red)
                     }
                     Spacer()
 HStack(spacing: 6) {
@@ -118,21 +119,33 @@ HStack(spacing: 6) {
                         if isPomodoroMode {
                             CustomButton(text: "+1m")
                                 .onTapGesture {
-                                    timeRemaining += 60
-                                    maxTime += 60
+                                    isBreakTime = false
+                                    isExtra = true
+                                    maxTime = 60
+                                    timeRemaining = maxTime
+                                    isPaused = false
+                                    timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
                                 }
                             CustomButton(text: "+5m")
                                 .onTapGesture {
-                                    timeRemaining += 300
-                                    maxTime += 300
-                                }
-                            CustomButton(text: "Skip Break")
-                                .onTapGesture {
                                     isBreakTime = false
-                                    pomodoroSession += 1
-                                    maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+                                    isExtra = true
+                                    maxTime = 300
                                     timeRemaining = maxTime
+                                    isPaused = false
+                                    timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
                                 }
+                            if isBreakTime {
+                                CustomButton(text: "skip break")
+                                    .onTapGesture {
+                                        isBreakTime = false
+                                        isExtra = false
+                                        maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+                                        timeRemaining = maxTime
+                                        isPaused = false
+                                        timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+                                    }
+                            }
                         } else {
                             CustomButton(text: String(settingsManager.settingsData.timer_presets[0]) + "m")
                                 .onTapGesture {
@@ -154,7 +167,7 @@ HStack(spacing: 6) {
                                     startPomodoroTimer()
                                 }
                         }
-                    } else {
+                } else {
                         CustomButton(text: "cancel").onTapGesture {
                             cancelTimer()
                         }
@@ -250,7 +263,7 @@ HStack(spacing: 6) {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
-        .background(Color(NSColor.windowBackgroundColor).opacity(0.2))
+        .background(Color(NSColor.windowBackgroundColor).opacity(0.5))
         .cornerRadius(10)
         .onAppear {
             // Ajouter l'observateur pour les actions de la fenêtre flottante
@@ -309,13 +322,16 @@ HStack(spacing: 6) {
         isPaused = false
         soundPlayer.stopSound()
     }
-    
+
     private func handlePomodoroCompletion() {
         if isBreakTime {
             // Break completed, prepare next work session or finish cycle
             isBreakTime = false
-            pomodoroSession += 1
-            
+            if !isExtra {
+                pomodoroSession += 1
+            }
+            isExtra = false
+
             if pomodoroSession > 4 {
                 // Completed full Pomodoro cycle
                 isPomodoroMode = false

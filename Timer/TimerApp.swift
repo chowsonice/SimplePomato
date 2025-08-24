@@ -141,9 +141,9 @@ struct FloatingTimerView: View {
 
     private var modeLabel: String {
         if isPomodoroMode {
-            return isBreakTime ? "BREAK" : "FOCUS"
+            return isBreakTime ? "break" : "focus"
         } else {
-            return "TIMER"
+            return "timer"
         }
     }
     
@@ -271,7 +271,8 @@ if isPomodoroMode {
                             .offset(y: -55)
                             .rotationEffect(.degrees(dotProgress * 360))
                             .animation(.easeInOut(duration: 0.5), value: dotProgress)
-                                            }
+                            .shadow(color: .white, radius: 2, x: 0, y: 0)
+                    }
                                             
                     // Temps restant au centre avec formatage amélioré
                     VStack(spacing: 2) {
