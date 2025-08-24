@@ -100,9 +100,13 @@ struct MainView: View {
                             .foregroundColor(isBreakTime ? .blue : .red)
                     }
                     Spacer()
-                    Text("Session \(pomodoroSession)/4")
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
+HStack(spacing: 6) {
+    ForEach(1...4, id: \.self) { idx in
+        Circle()
+            .fill(idx <= pomodoroSession ? Color.red : Color.gray.opacity(0.3))
+            .frame(width: 5, height: 5)
+    }
+}
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 4)

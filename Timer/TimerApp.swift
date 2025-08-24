@@ -182,11 +182,20 @@ struct FloatingTimerView: View {
                 .padding(24)
             VStack(spacing: 12) {
                     // Label du mode (FOCUS/BREAK/TIMER)
-            Text(modeLabel)
-                .font(.system(size: 13))
-                .fontWeight(.medium)
-                .foregroundColor(.primary)
-                .tracking(0.8)
+Text(modeLabel)
+    .font(.system(size: 13))
+    .fontWeight(.medium)
+    .foregroundColor(.primary)
+    .tracking(0.8)
+if isPomodoroMode {
+    HStack(spacing: 6) {
+        ForEach(1...4, id: \.self) { idx in
+            Circle()
+                .fill(idx <= pomodoroSession ? Color.red : Color.gray.opacity(0.3))
+                .frame(width: 5, height: 5)
+        }
+    }
+}
                         
                 // Indicateur de progression circulaire
                 ZStack {
