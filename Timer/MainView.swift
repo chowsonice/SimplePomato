@@ -115,25 +115,45 @@ HStack(spacing: 6) {
             HStack(spacing: 1) {
                 Group {
                     if isPaused {
-                        CustomButton(text: String(settingsManager.settingsData.timer_presets[0]) + "m")
-                            .onTapGesture {
-                                startRegularTimer(preset: 0)
-                            }
-                        CustomButton(text: String(settingsManager.settingsData.timer_presets[1]) + "m")
-                            .onTapGesture {
-                                startRegularTimer(preset: 1)
-                            }
-                        CustomButton(text: String(settingsManager.settingsData.timer_presets[2]) + "m")
-                            .onTapGesture {
-                                startRegularTimer(preset: 2)
-                            }
-                        CustomIconButton(
-                            text: pomodoroButtonText(),
-                            iconName: pomodoroIconName()
-                        )
-                            .onTapGesture {
-                                startPomodoroTimer()
-                            }
+                        if isPomodoroMode {
+                            CustomButton(text: "+1m")
+                                .onTapGesture {
+                                    timeRemaining += 60
+                                    maxTime += 60
+                                }
+                            CustomButton(text: "+5m")
+                                .onTapGesture {
+                                    timeRemaining += 300
+                                    maxTime += 300
+                                }
+                            CustomButton(text: "Skip Break")
+                                .onTapGesture {
+                                    isBreakTime = false
+                                    pomodoroSession += 1
+                                    maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
+                                    timeRemaining = maxTime
+                                }
+                        } else {
+                            CustomButton(text: String(settingsManager.settingsData.timer_presets[0]) + "m")
+                                .onTapGesture {
+                                    startRegularTimer(preset: 0)
+                                }
+                            CustomButton(text: String(settingsManager.settingsData.timer_presets[1]) + "m")
+                                .onTapGesture {
+                                    startRegularTimer(preset: 1)
+                                }
+                            CustomButton(text: String(settingsManager.settingsData.timer_presets[2]) + "m")
+                                .onTapGesture {
+                                    startRegularTimer(preset: 2)
+                                }
+                            CustomIconButton(
+                                text: pomodoroButtonText(),
+                                iconName: pomodoroIconName()
+                            )
+                                .onTapGesture {
+                                    startPomodoroTimer()
+                                }
+                        }
                     } else {
                         CustomButton(text: "cancel").onTapGesture {
                             cancelTimer()
@@ -321,6 +341,9 @@ HStack(spacing: 6) {
             timeRemaining = maxTime
             // Don't restart timer automatically - wait for user to click start
         }
+
+        // Replace preset menu with new options when paused and in Pomodoro mode
+        // No additional function is needed; the menu is directly handled in the UI logic.
     }
     
     private func cancelTimer() {
