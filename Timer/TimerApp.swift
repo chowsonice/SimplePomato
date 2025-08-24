@@ -415,6 +415,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         floatingTimerWindow.isOpaque = false
         floatingTimerWindow.backgroundColor = NSColor.clear
         floatingTimerWindow.level = .floating
+        floatingTimerWindow.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         floatingTimerWindow.isMovableByWindowBackground = true
         floatingTimerWindow.hasShadow = false
         floatingTimerWindow.isReleasedWhenClosed = false
