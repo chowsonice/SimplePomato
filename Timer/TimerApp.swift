@@ -321,7 +321,7 @@ if isPomodoroMode {
             }
             .padding(.all, 35.0)
         }
-    .frame(width: 250)
+    .frame(width: 200)
     }
 }
 
