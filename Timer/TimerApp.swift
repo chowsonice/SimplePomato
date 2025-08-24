@@ -112,14 +112,13 @@ func formatTimeComponents(seconds: Int) -> (minutes: String, seconds: String) {
 // Floating Timer View Structure
 struct FloatingTimerView: View {
     struct TimerColors {
-        static let background = Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.7)
+        static let background = Color.white.opacity(0.8)
         static let defaultProgress = Color.red
         static let pomodoroWork = Color.red
         static let pomodoroBreak = Color.black
         static let pomodoroWorkSegment = Color.red
         static let pomodoroBreakSegment = Color.black
-        static let timerTrack = Color(red: 0.73, green: 0.73, blue: 0.73)
-        static let timerCircle = Color(red: 0.15, green: 0.15, blue: 0.15)
+        static let timerTrack = Color.gray.opacity(0.3)
     }
 
     var timeRemaining: Int
@@ -163,10 +162,10 @@ struct FloatingTimerView: View {
 
         if isBreakTime {
             // En pause : montrer le travail complété et la progression de la pause
-            return (workPortion - 0.04, progress * (breakPortion - 0.08))
+            return (workPortion - 0.02, progress * (breakPortion - 0.08))
         } else {
             // En travail : montrer seulement la progression du travail
-            return (0.04 + progress * (workPortion - 0.08), 0)
+            return (0.02 + progress * (workPortion - 0.08), 0)
         }
     }
     
@@ -174,9 +173,14 @@ struct FloatingTimerView: View {
         ZStack {
             // Fond harmonisé avec MainView
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.85))
-                .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 2)
-                VStack(spacing: 12) {
+                .stroke(Color(red: 0.69, green: 0.69, blue: 0.69), lineWidth: 0.5)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(TimerColors.background)
+                )
+                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 4)
+                .padding(24)
+            VStack(spacing: 12) {
                     // Label du mode (FOCUS/BREAK/TIMER)
             Text(modeLabel)
                 .font(.system(size: 13))
@@ -199,22 +203,22 @@ struct FloatingTimerView: View {
                         let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
 
                         Circle()
-                            .trim(from: 0.04, to: workPortion - 0.04)
-                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .trim(from: 0.02, to: workPortion - 0.02)
+                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
 
                         Circle()
-                            .trim(from: workPortion + 0.04, to: 1 - 0.04)
-                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .trim(from: workPortion + 0.02, to: 1 - 0.02)
+                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
                         
                         // Segment de travail (violet) - commence au début
                         if segments.workProgress > 0 {
                             Circle()
-                                .trim(from: 0.04, to: segments.workProgress)
-                                .stroke(workColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                                .trim(from: 0.02, to: segments.workProgress)
+                                .stroke(workColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                 .frame(width: 110, height: 110)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.workProgress)
@@ -223,21 +227,21 @@ struct FloatingTimerView: View {
                         // Segment de pause (vert) - commence après le travail
                         if segments.breakProgress > 0 {
                             Circle()
-                                .trim(from: workPortion + 0.04, to: workPortion + 0.04 + segments.breakProgress)
-                                .stroke(breakColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                                .trim(from: workPortion + 0.02, to: workPortion + 0.02 + segments.breakProgress)
+                                .stroke(breakColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                 .frame(width: 110, height: 110)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.breakProgress)
                         }
                     } else {
                         Circle()
-                            .stroke(TimerColors.timerCircle, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 110, height: 110)
 
                         // Mode timer normal
                         Circle()
                             .trim(from: 0, to: progress)
-                            .stroke(progressColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .stroke(progressColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
                             .animation(.easeInOut(duration: 0.5), value: progress)
@@ -250,40 +254,40 @@ struct FloatingTimerView: View {
                         let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
                         
                         let dotProgress: Double = isPomodoroMode ? 
-                            (isBreakTime ? workPortion + 0.04 + (progress * (breakPortion - 0.08)) : 0.04 + progress * (workPortion - 0.08)) :
+                            (isBreakTime ? workPortion + 0.02 + (progress * (breakPortion - 0.08)) : 0.02 + progress * (workPortion - 0.08)) :
                             progress
                         Circle()
                             .fill(Color.white)
                             .frame(width: 8, height: 8)
-                            .offset(y: -45)
+                            .offset(y: -55)
                             .rotationEffect(.degrees(dotProgress * 360))
                             .animation(.easeInOut(duration: 0.5), value: dotProgress)
-                    }
-                    
+                                            }
+                                            
                     // Temps restant au centre avec formatage amélioré
-VStack(spacing: 2) {
-    let timeComponents = formatTimeComponents(seconds: timeRemaining)
-    HStack(alignment: .lastTextBaseline, spacing: 2) {
-Text(timeComponents.minutes)
-    .font(.system(size: 28))
-    .fontWeight(.thin)
-    .foregroundColor(.primary)
-Text("m")
-    .font(.system(size: 12))
-    .fontWeight(.medium)
-    .foregroundColor(.primary)
-    }
-    HStack(alignment: .lastTextBaseline, spacing: 2) {
-Text(timeComponents.seconds)
-    .font(.system(size: 28))
-    .fontWeight(.thin)
-    .foregroundColor(.primary)
-Text("s")
-    .font(.system(size: 12))
-    .fontWeight(.medium)
-    .foregroundColor(.primary)
-    }
-}
+                    VStack(spacing: 2) {
+                        let timeComponents = formatTimeComponents(seconds: timeRemaining)
+                        HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(timeComponents.minutes)
+                        .font(.system(size: 28))
+                        .fontWeight(.thin)
+                        .foregroundColor(.primary)
+                    Text("m")
+                        .font(.system(size: 12))
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        }
+                        HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(timeComponents.seconds)
+                        .font(.system(size: 28))
+                        .fontWeight(.thin)
+                        .foregroundColor(.primary)
+                    Text("s")
+                        .font(.system(size: 12))
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        }
+                    }
                 }
                 
                 // Bouton d'action - style de l'image
@@ -306,7 +310,7 @@ Text("s")
                 .scaleEffect(1.0)
                 .animation(.easeInOut(duration: 0.2), value: isPaused)
             }
-            .padding(.all, 10.0)
+            .padding(.all, 35.0)
         }
     .frame(width: 250)
     }
