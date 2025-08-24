@@ -111,7 +111,17 @@ func formatTimeComponents(seconds: Int) -> (minutes: String, seconds: String) {
 
 // Floating Timer View Structure
 struct FloatingTimerView: View {
-    private static let backgroundColor = Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.7)
+    struct TimerColors {
+        static let background = Color(red: 0.902, green: 0.902, blue: 0.902).opacity(0.7)
+        static let defaultProgress = Color.red
+        static let pomodoroWork = Color.red
+        static let pomodoroBreak = Color.black
+        static let pomodoroWorkSegment = Color.red
+        static let pomodoroBreakSegment = Color.black
+        static let timerTrack = Color(red: 0.73, green: 0.73, blue: 0.73)
+        static let timerCircle = Color(red: 0.15, green: 0.15, blue: 0.15)
+    }
+
     var timeRemaining: Int
     var totalTime: Int
     var isPaused: Bool
@@ -122,15 +132,14 @@ struct FloatingTimerView: View {
     var breakDuration: Int
     var longBreakDuration: Int
 
-    // Couleurs selon le design spécifié - ajustées pour correspondre à l'image
     private var progressColor: Color {
         if isPomodoroMode {
-            return isBreakTime ? Color(red: 0.7, green: 0.9, blue: 0.3) : Color(red: 0.8, green: 0.4, blue: 0.8) // Vert pour pause, Violet pour travail
+            return isBreakTime ? TimerColors.pomodoroBreak : TimerColors.pomodoroWork
         } else {
-            return Color(red: 0.23, green: 0.51, blue: 0.98) // Bleu par défaut
+            return TimerColors.defaultProgress
         }
     }
-    
+
     private var modeLabel: String {
         if isPomodoroMode {
             return isBreakTime ? "BREAK" : "FOCUS"
@@ -142,11 +151,6 @@ struct FloatingTimerView: View {
     private var progress: Double {
         guard totalTime > 0 else { return 0 }
         return max(0, min(1, Double(totalTime - timeRemaining) / Double(totalTime)))
-    }
-
-    private var pomodoroProgress: Double {
-        guard totalTime > 0 else { return 0 }
-        return max(0, min(1, Double(timeRemaining) / Double(totalTime)))
     }
     
     // Calculer les segments pour le mode Pomodoro
@@ -186,8 +190,8 @@ struct FloatingTimerView: View {
 
                     if isPomodoroMode {
                         // Mode Pomodoro : afficher les segments de travail et de pause
-                        let workColor = Color(red: 0.8, green: 0.4, blue: 0.8) // Violet pour travail
-                        let breakColor = Color(red: 0.7, green: 0.9, blue: 0.3) // Vert pour pause
+                        let workColor = TimerColors.pomodoroWorkSegment
+                        let breakColor = TimerColors.pomodoroBreakSegment
                         let segments = pomodoroSegments()
 
                         let total = Double(workDuration + breakDuration)
@@ -196,14 +200,14 @@ struct FloatingTimerView: View {
 
                         Circle()
                             .trim(from: 0.04, to: workPortion - 0.04)
-                            .stroke(Color(red: 0.73, green: 0.73, blue: 0.73), style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                            .frame(width: 90, height: 90)
+                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
 
                         Circle()
                             .trim(from: workPortion + 0.04, to: 1 - 0.04)
-                            .stroke(Color(red: 0.73, green: 0.73, blue: 0.73), style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                            .frame(width: 90, height: 90)
+                            .stroke(TimerColors.timerTrack, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
                         
                         // Segment de travail (violet) - commence au début
@@ -211,7 +215,7 @@ struct FloatingTimerView: View {
                             Circle()
                                 .trim(from: 0.04, to: segments.workProgress)
                                 .stroke(workColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                                .frame(width: 90, height: 90)
+                                .frame(width: 110, height: 110)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.workProgress)
                         }
@@ -221,20 +225,20 @@ struct FloatingTimerView: View {
                             Circle()
                                 .trim(from: workPortion + 0.04, to: workPortion + 0.04 + segments.breakProgress)
                                 .stroke(breakColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                                .frame(width: 90, height: 90)
+                                .frame(width: 110, height: 110)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 0.5), value: segments.breakProgress)
                         }
                     } else {
                         Circle()
-                            .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                            .frame(width: 90, height: 90)
+                            .stroke(TimerColors.timerCircle, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .frame(width: 110, height: 110)
 
                         // Mode timer normal
                         Circle()
                             .trim(from: 0, to: progress)
                             .stroke(progressColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                            .frame(width: 90, height: 90)
+                            .frame(width: 110, height: 110)
                             .rotationEffect(.degrees(-90))
                             .animation(.easeInOut(duration: 0.5), value: progress)
                     }
