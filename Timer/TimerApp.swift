@@ -156,9 +156,15 @@ struct FloatingTimerView: View {
     private func pomodoroSegments() -> (workProgress: Double, breakProgress: Double) {
         if !isPomodoroMode { return (0, 0) }
         
-        let total = Double(workDuration + breakDuration)
-        let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
-        let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+        if (pomodoroSession == 4) {
+            let total = Double(workDuration + longBreakDuration)
+            let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
+            let breakPortion: Double = total > 0 ? Double(longBreakDuration) / total : 0
+        } else {
+            let total = Double(workDuration + breakDuration)
+            let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
+            let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+        }
 
         if isBreakTime {
             // En pause : montrer le travail complété et la progression de la pause

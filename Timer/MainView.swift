@@ -63,7 +63,6 @@ struct MainView: View {
     @State private var isPomodoroMode = false
     @State private var pomodoroSession = 1 // 1-4 for work sessions
     @State private var isBreakTime = false
-    @State private var completedPomodoros = 0
     @State private var isExtra = false
     @State private var regularDuration: Int = 25 // Default regular duration in minutes
     @State private var workDuration: Int = 25 // Default work duration in minutes
@@ -168,16 +167,21 @@ HStack(spacing: 6) {
                                 }
                         }
                 } else {
-                        CustomButton(text: "cancel").onTapGesture {
-                            cancelTimer()
-                        }
-                        CustomButton(text: "restart").onTapGesture {
-                            restartTimer()
+                    if isPomodoroMode {
+                        CustomButton(text: "skip").onTapGesture {
+                            handlePomodoroCompletion()
                         }
                     }
+                    CustomButton(text: "cancel").onTapGesture {
+                        cancelTimer()
+                    }
+                    CustomButton(text: "restart").onTapGesture {
+                        restartTimer()
+                    }
                 }
+            }
                 Spacer()
-                
+        
                 Menu {
                     Button("Settings") {
                         AppDelegate.shared.openCocoaWindow(id: "settings")
@@ -263,7 +267,7 @@ HStack(spacing: 6) {
         }
         .frame(width: 250)
         .padding(.all, 10.0)
-        .background(Color(NSColor.windowBackgroundColor).opacity(0.5))
+        .background(Color.white.opacity(0.6))
         .cornerRadius(10)
         .onAppear {
             // Ajouter l'observateur pour les actions de la fenêtre flottante
@@ -311,7 +315,6 @@ HStack(spacing: 6) {
         isPomodoroMode = true
         pomodoroSession = 1
         isBreakTime = false
-        completedPomodoros = 0
 
         workDuration = settingsManager.settingsData.pomodoro_work_duration
         breakDuration = settingsManager.settingsData.pomodoro_break_duration
@@ -325,20 +328,19 @@ HStack(spacing: 6) {
 
     private func handlePomodoroCompletion() {
         if isBreakTime {
-            // Break completed, prepare next work session or finish cycle
+            // Work completed, prepare next break session or finish cycle
             isBreakTime = false
+
+            if (pomodoroSession == 4) {
+                // Completed full Pomodoro cycle
+                pomodoroSession = 1
+                return
+            }
+
             if !isExtra {
                 pomodoroSession += 1
             }
             isExtra = false
-
-            if pomodoroSession > 4 {
-                // Completed full Pomodoro cycle
-                isPomodoroMode = false
-                pomodoroSession = 1
-                completedPomodoros += 1
-                return
-            }
             
             // Prepare next work session but don't auto-start
             maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
@@ -349,13 +351,17 @@ HStack(spacing: 6) {
             isBreakTime = true
             
             // Long break after 4th session, short break otherwise
-            let breakDuration = (pomodoroSession == 4) ? 
-                settingsManager.settingsData.pomodoro_long_break_duration :
-                settingsManager.settingsData.pomodoro_break_duration
-            
-            maxTime = breakDuration * 60
-            timeRemaining = maxTime
-            // Don't restart timer automatically - wait for user to click start
+            if pomodoroSession == 4 {
+                // Final session completed, prepare long break
+                let breakDuration = settingsManager.settingsData.pomodoro_long_break_duration
+                maxTime = breakDuration * 60
+                timeRemaining = maxTime
+            } else {
+                // Prepare short break
+                let breakDuration = settingsManager.settingsData.pomodoro_break_duration
+                maxTime = breakDuration * 60
+                timeRemaining = maxTime
+            }
         }
 
         // Replace preset menu with new options when paused and in Pomodoro mode
