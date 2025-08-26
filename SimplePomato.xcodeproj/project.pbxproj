@@ -17,6 +17,7 @@
 		307181802A2E98DE00E10B2C /* beep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3071817F2A2E98DE00E10B2C /* beep.mp3 */; };
 		30AB56DB2A3D56DB0038E81A /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = 30AB56DA2A3D56DB0038E81A /* test.png */; };
 		399968A02E55D54A00911A43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3999689F2E55D54A00911A43 /* Assets.xcassets */; };
+		39AE823C2E5DFC5F00AB2E44 /* TimerControlModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39AE823B2E5DFC5F00AB2E44 /* TimerControlModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		3096B6582A2C274D00E3EC2A /* SimplePomato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimplePomato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30AB56DA2A3D56DB0038E81A /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test.png; sourceTree = "<group>"; };
 		3999689F2E55D54A00911A43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		39AE823B2E5DFC5F00AB2E44 /* TimerControlModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControlModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +51,7 @@
 		3071815B2A2D740E00E10B2C /* Timer */ = {
 			isa = PBXGroup;
 			children = (
+				39AE823B2E5DFC5F00AB2E44 /* TimerControlModel.swift */,
 				3071815C2A2D740E00E10B2C /* AboutView.swift */,
 				3071815D2A2D740E00E10B2C /* SettingsView.swift */,
 				3071815F2A2D740E00E10B2C /* SoundPlayer.swift */,
@@ -157,6 +160,7 @@
 				307181712A2D740E00E10B2C /* TimeHelper.swift in Sources */,
 				307181722A2D740E00E10B2C /* TimerApp.swift in Sources */,
 				3071816C2A2D740E00E10B2C /* SoundPlayer.swift in Sources */,
+				39AE823C2E5DFC5F00AB2E44 /* TimerControlModel.swift in Sources */,
 				307181702A2D740E00E10B2C /* MainView.swift in Sources */,
 				3071816A2A2D740E00E10B2C /* SettingsView.swift in Sources */,
 			);

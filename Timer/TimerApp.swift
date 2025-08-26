@@ -2,39 +2,38 @@ import SwiftUI
 
 @main
 struct UtilityApp: App {
-    
-    @State private var timeRemaining: Int = 300
+    @ObservedObject var timerModel = TimerControlModel.shared
     @State private var appearanceObserver: NSObjectProtocol?
 
-var body: some Scene {
-    MenuBarExtra {
-        MainView(timeRemaining: $timeRemaining)
-    } label: {
-        Image(nsImage: createMenuBarImage(text: formatDuration(seconds: timeRemaining)))
-            .onAppear {
-                setupAppearanceObserver()
-            }
-            .onDisappear {
-                removeAppearanceObserver()
-            }
-    }
-    .menuBarExtraStyle(.window)
-    .windowStyle(HiddenTitleBarWindowStyle())
+    var body: some Scene {
+        MenuBarExtra {
+            MainView()
+        } label: {
+            Image(nsImage: createMenuBarImage(text: formatDuration(seconds: timerModel.timeRemaining)))
+                .onAppear {
+                    setupAppearanceObserver()
+                }
+                .onDisappear {
+                    removeAppearanceObserver()
+                }
+        }
+        .menuBarExtraStyle(.window)
+        .windowStyle(HiddenTitleBarWindowStyle())
 
-    WindowGroup("Floating Timer") {
-        FloatingTimerView(
-            timeRemaining: timeRemaining,
-            totalTime: 300,
-            isPaused: true,
-            isPomodoroMode: false,
-            isBreakTime: false,
-            pomodoroSession: 1,
-            workDuration: 25,
-            breakDuration: 5,
-            longBreakDuration: 15
-        )
+        WindowGroup("Floating Timer") {
+            FloatingTimerView(
+                timeRemaining: timerModel.timeRemaining,
+                totalTime: timerModel.maxTime,
+                isPaused: timerModel.isPaused,
+                isPomodoroMode: timerModel.isPomodoroMode,
+                isBreakTime: timerModel.isBreakTime,
+                pomodoroSession: timerModel.pomodoroSession,
+                workDuration: timerModel.workDuration,
+                breakDuration: timerModel.breakDuration,
+                longBreakDuration: timerModel.longBreakDuration
+            )
+        }
     }
-}
     
     private func setupAppearanceObserver() {
         appearanceObserver = NotificationCenter.default.addObserver(
@@ -43,7 +42,7 @@ var body: some Scene {
             queue: .main
         ) { _ in
             // Force une mise à jour de l'image quand les paramètres d'écran changent
-            timeRemaining = timeRemaining // Trigger une mise à jour
+            timerModel.timeRemaining = timerModel.timeRemaining // Trigger une mise à jour
         }
     }
     
