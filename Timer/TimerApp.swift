@@ -299,25 +299,63 @@ if isPomodoroMode {
                     }
                 }
                 
-                // Bouton d'action - style de l'image
-                Button(action: {
-                    // Action sera gérée par l'AppDelegate
-                    NotificationCenter.default.post(name: NSNotification.Name("ToggleTimer"), object: nil)
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(progressColor)
-                            .frame(width: 36, height: 36)
-                            .shadow(color: progressColor.opacity(0.3), radius: 4, x: 0, y: 2)
-                        
-                        Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
+                // Action buttons for floating view
+                if (isPomodoroMode) {
+                    HStack(spacing: 14) {
+                        Button(action: {
+                            TimerControlModel.shared.restartTimer()
+                        }) {
+                            Text("Restart")
+                                .font(.system(size: 13))
+                                .frame(width: 60, height: 28)
+                                .background(Color.gray.opacity(0.15))
+                                .cornerRadius(6)
+                        }
+                        Button(action: {
+                            if TimerControlModel.shared.isBreakTime {
+                                TimerControlModel.shared.skipBreak()
+                            } else {
+                                TimerControlModel.shared.handlePomodoroCompletion()
+                            }
+                        }) {
+                            Text("Skip")
+                                .font(.system(size: 13))
+                                .frame(width: 48, height: 28)
+                                .background(Color.gray.opacity(0.15))
+                                .cornerRadius(6)
+                        }
+                        Button(action: {
+                            TimerControlModel.shared.cancelTimer()
+                        }) {
+                            Text("Cancel")
+                                .font(.system(size: 13))
+                                .frame(width: 60, height: 28)
+                                .background(Color.red.opacity(0.15))
+                                .cornerRadius(6)
+                        }
+                    }
+                } else if (!isPomodoroMode && timeRemaining < totalTime) {
+                    HStack(spacing: 14) {
+                        Button(action: {
+                            TimerControlModel.shared.restartTimer()
+                        }) {
+                            Text("Restart")
+                                .font(.system(size: 13))
+                                .frame(width: 60, height: 28)
+                                .background(Color.gray.opacity(0.15))
+                                .cornerRadius(6)
+                        }
+                        Button(action: {
+                            TimerControlModel.shared.cancelTimer()
+                        }) {
+                            Text("Cancel")
+                                .font(.system(size: 13))
+                                .frame(width: 60, height: 28)
+                                .background(Color.red.opacity(0.15))
+                                .cornerRadius(6)
+                        }
                     }
                 }
-                .buttonStyle(PlainButtonStyle())
-                .scaleEffect(1.0)
-                .animation(.easeInOut(duration: 0.2), value: isPaused)
             }
             .padding(.all, 35.0)
         }
