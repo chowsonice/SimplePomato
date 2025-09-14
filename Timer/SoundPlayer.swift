@@ -9,14 +9,17 @@ import AVFoundation
 class SoundPlayer {
     var audioPlayer: AVAudioPlayer?
     var volume: Float = 1.0 // Volume property with default value of 1.0
+    private var testDelegate: SoundPlayerDelegate?
     
     init() {
         prepareAudioPlayer()
+        testDelegate = SoundPlayerDelegate()
     }
     
     func prepareAudioPlayer() {
         guard let soundURL = Bundle.main.url(forResource: "beep", withExtension: "mp3") else {
-            fatalError("Sound file not found")
+            print("Warning: Sound file 'beep.mp3' not found in bundle")
+            return
         }
         
         do {
@@ -29,18 +32,26 @@ class SoundPlayer {
     }
     
     func playSound(volume: Int) {
-        audioPlayer?.play()
-        audioPlayer?.volume = (Float(volume)/100)
+        guard let audioPlayer = audioPlayer else {
+            print("Warning: Audio player not available")
+            return
+        }
+        audioPlayer.play()
+        audioPlayer.volume = (Float(volume)/100)
     }
     
     func playTestSound(volume: Int) {
-        audioPlayer?.numberOfLoops = 0
-        audioPlayer?.volume = (Float(volume)/100)
+        guard let audioPlayer = audioPlayer else {
+            print("Warning: Audio player not available")
+            return
+        }
+        audioPlayer.numberOfLoops = 0
+        audioPlayer.volume = (Float(volume)/100)
         
-        let delegate = SoundPlayerDelegate()
-        audioPlayer?.delegate = delegate
+        // Utiliser le delegate existant au lieu d'en créer un nouveau
+        audioPlayer.delegate = testDelegate
         
-        audioPlayer?.play()
+        audioPlayer.play()
     }
     
     func stopSound() {

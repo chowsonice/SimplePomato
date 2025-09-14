@@ -102,11 +102,11 @@ struct MainView: View {
                         if timerModel.isPomodoroMode {
                             CustomButton(text: "+1m")
                                 .onTapGesture {
-                                    timerModel.startExtra(minutes: 1)
+                                    timerModel.addTimeAndSwitchMode(minutes: 1)
                                 }
                             CustomButton(text: "+5m")
                                 .onTapGesture {
-                                    timerModel.startExtra(minutes: 5)
+                                    timerModel.addTimeAndSwitchMode(minutes: 5)
                                 }
                             if timerModel.isBreakTime {
                                 CustomButton(text: "skip break")

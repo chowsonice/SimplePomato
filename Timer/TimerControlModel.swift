@@ -31,10 +31,12 @@ class TimerControlModel: ObservableObject {
 
     func startRegularTimer(preset: Int) {
         isPomodoroMode = false
+        isPaused = false
         currentTimerPreset = preset
         regularDuration = settingsManager.settingsData.timer_presets[preset]
         maxTime = max(regularDuration * 60, 1)
         timeRemaining = maxTime
+        stopTimer()
         startTimer()
         soundPlayer.stopSound()
     }
@@ -54,7 +56,7 @@ class TimerControlModel: ObservableObject {
     }
 
     func startExtra(minutes: Int) {
-        isBreakTime = false
+        stopTimer()
         isExtra = true
         maxTime = minutes * 60
         timeRemaining = maxTime
@@ -62,35 +64,75 @@ class TimerControlModel: ObservableObject {
         startTimer()
     }
 
+    func addTimeAndSwitchMode(minutes: Int) {
+        stopTimer()
+        isExtra = false
+        
+        if isBreakTime {
+            // Actuellement en pause -> retourner au travail avec du temps supplémentaire
+            isBreakTime = false
+            let workDuration = settingsManager.settingsData.pomodoro_work_duration
+            maxTime = (workDuration + minutes) * 60
+            timeRemaining = maxTime
+        } else {
+            // Actuellement au travail -> passer à la pause avec du temps supplémentaire
+            isBreakTime = true
+            let breakDuration = pomodoroSession == 4 ? 
+                settingsManager.settingsData.pomodoro_long_break_duration : 
+                settingsManager.settingsData.pomodoro_break_duration
+            maxTime = (breakDuration + minutes) * 60
+            timeRemaining = maxTime
+        }
+        
+        isPaused = false
+        startTimer()
+    }
+
     func skipBreak() {
+        stopTimer()
         isBreakTime = false
         isExtra = false
         maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
         timeRemaining = maxTime
         isPaused = false
+        
+        // Incrémenter la session après avoir sauté une pause
+        if pomodoroSession < 4 {
+            pomodoroSession += 1
+        } else {
+            pomodoroSession = 1
+        }
+        
         startTimer()
     }
 
     func handlePomodoroCompletion() {
+        stopTimer()
         if isBreakTime {
+            // Fin de pause : retour au travail
+            isPaused = true
             isBreakTime = false
-            if pomodoroSession == 4 {
-                pomodoroSession = 1
-                return
-            }
-            if !isExtra {
-                pomodoroSession += 1
-            }
             isExtra = false
+            // Incrémenter la session seulement après une pause de travail normale (pas extra)
+            if !isExtra && pomodoroSession < 4 {
+                pomodoroSession += 1
+            } else if pomodoroSession == 4 {
+                pomodoroSession = 1
+            }
             maxTime = settingsManager.settingsData.pomodoro_work_duration * 60
             timeRemaining = maxTime
         } else {
+            // Fin de travail : début de pause
+            isPaused = true
             isBreakTime = true
+            isExtra = false
             if pomodoroSession == 4 {
+                // Pause longue après la 4ème session
                 let breakDuration = settingsManager.settingsData.pomodoro_long_break_duration
                 maxTime = breakDuration * 60
                 timeRemaining = maxTime
             } else {
+                // Pause courte
                 let breakDuration = settingsManager.settingsData.pomodoro_break_duration
                 maxTime = breakDuration * 60
                 timeRemaining = maxTime
@@ -99,18 +141,19 @@ class TimerControlModel: ObservableObject {
     }
 
     func cancelTimer() {
-        if isPomodoroMode {
-            isPomodoroMode = false
-            pomodoroSession = 1
-            isBreakTime = false
-        }
-        timeRemaining = maxTime
-        isPaused = true
         stopTimer()
+        isPaused = true
+        isPomodoroMode = false
+        pomodoroSession = 1
+        isBreakTime = false
+        isExtra = false
+        timeRemaining = maxTime
     }
 
     func restartTimer() {
+        stopTimer()
         timeRemaining = maxTime
+        isPaused = false
         startTimer()
     }
 
@@ -140,6 +183,7 @@ class TimerControlModel: ObservableObject {
     private func stopTimer() {
         timer?.cancel()
         timer = nil
+        isPaused = true
     }
 
     private func tick() {

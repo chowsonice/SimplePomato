@@ -208,7 +208,7 @@ if isPomodoroMode {
 
                         let total = Double(workDuration + breakDuration)
                         let workPortion: Double = total > 0 ? Double(workDuration) / total : 0
-                        let breakPortion: Double = total > 0 ? Double(breakDuration) / total : 0
+                        let _ = total > 0 ? Double(breakDuration) / total : 0 // breakPortion not used in this context
 
                         Circle()
                             .trim(from: 0.02, to: workPortion - 0.02)
